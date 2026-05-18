@@ -12,6 +12,7 @@ Chamado por:
     ui/cli.py                                             → criar_tabelas()
     ui/gui.py                                             → criar_tabelas()
 """
+
 import sqlite3
 from pathlib import Path
 

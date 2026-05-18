@@ -10,6 +10,7 @@ Usado por:
     services/pessoa_service.py
     services/atendimento_service.py
 """
+
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -25,6 +26,7 @@ class Pessoa:
         telefone : Telefone de contato (opcional).
         id       : Chave primária gerada pelo banco. None antes de ser inserida.
     """
+
     nome: str
     cpf: str
     telefone: str
@@ -43,6 +45,7 @@ class Atendimento:
         id          : Chave primária gerada pelo banco. None antes de ser inserido.
         pessoa_nome : Nome da pessoa — preenchido apenas em consultas com JOIN.
     """
+
     pessoa_id: int
     descricao: str
     status: str

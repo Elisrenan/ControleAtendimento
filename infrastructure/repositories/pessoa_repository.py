@@ -13,11 +13,11 @@ Chama:
     infrastructure/database.py → conectar()
     domain/models.py           → Pessoa
 """
-import sqlite3
+
 from typing import List, Optional
 
-from infrastructure.database import conectar
 from domain.models import Pessoa
+from infrastructure.database import conectar
 
 
 def inserir(pessoa: Pessoa) -> None:
@@ -54,7 +54,9 @@ def listar_todos() -> List[Pessoa]:
     linhas = cursor.fetchall()
     conexao.close()
 
-    return [Pessoa(id=l[0], nome=l[1], cpf=l[2], telefone=l[3]) for l in linhas]
+    return [
+        Pessoa(id=row[0], nome=row[1], cpf=row[2], telefone=row[3]) for row in linhas
+    ]
 
 
 def buscar_por_nome_ou_cpf(termo: str) -> List[Pessoa]:
@@ -70,14 +72,17 @@ def buscar_por_nome_ou_cpf(termo: str) -> List[Pessoa]:
     cursor = conexao.cursor()
 
     cursor.execute(
-        "SELECT id, nome, cpf, telefone FROM pessoas WHERE nome LIKE ? OR cpf LIKE ? ORDER BY nome",
+        "SELECT id, nome, cpf, telefone FROM pessoas"
+        " WHERE nome LIKE ? OR cpf LIKE ? ORDER BY nome",
         (f"%{termo}%", f"%{termo}%"),
     )
 
     linhas = cursor.fetchall()
     conexao.close()
 
-    return [Pessoa(id=l[0], nome=l[1], cpf=l[2], telefone=l[3]) for l in linhas]
+    return [
+        Pessoa(id=row[0], nome=row[1], cpf=row[2], telefone=row[3]) for row in linhas
+    ]
 
 
 def buscar_por_id(pessoa_id: int) -> Optional[Pessoa]:
@@ -121,7 +126,8 @@ def contar_atendimentos_ativos(pessoa_id: int) -> int:
     cursor = conexao.cursor()
 
     cursor.execute(
-        "SELECT COUNT(*) FROM atendimentos WHERE pessoa_id = ? AND status IN ('aberto', 'em andamento')",
+        "SELECT COUNT(*) FROM atendimentos"
+        " WHERE pessoa_id = ? AND status IN ('aberto', 'em andamento')",
         (pessoa_id,),
     )
 

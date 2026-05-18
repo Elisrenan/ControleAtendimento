@@ -12,7 +12,10 @@ Chama:
     ui/cli.py                  → executar()
     ui/gui.py                  → iniciar_gui()
 """
+
 import sys
+
+from infrastructure.database import criar_tabelas
 
 
 def main():
@@ -21,9 +24,11 @@ def main():
 
     if "--gui" in sys.argv:
         from ui.gui import iniciar_gui
+
         iniciar_gui()
     else:
         from ui.cli import executar
+
         executar()
 
 

@@ -8,13 +8,15 @@ Fluxo testado:
     test → atendimento_service → atendimento_repository → SQLite (temporário)
                                → pessoa_repository      → SQLite (temporário)
 """
+
 import pytest
-from services.pessoa_service import cadastrar_pessoa, listar_pessoas, excluir_pessoa
+
 from services.atendimento_service import (
-    registrar_atendimento,
-    listar_atendimentos,
     atualizar_status_atendimento,
+    listar_atendimentos,
+    registrar_atendimento,
 )
+from services.pessoa_service import cadastrar_pessoa, excluir_pessoa, listar_pessoas
 
 
 def _criar_pessoa(cpf="000.000.000-00"):
@@ -25,6 +27,7 @@ def _criar_pessoa(cpf="000.000.000-00"):
 
 # ─── registrar_atendimento ────────────────────────────────────────────────────
 
+
 def test_registrar_atendimento_com_sucesso():
     """Registrar um atendimento com dados válidos deve retornar True."""
     pid = _criar_pessoa()
@@ -34,7 +37,9 @@ def test_registrar_atendimento_com_sucesso():
 
 
 def test_registrar_atendimento_pessoa_inexistente():
-    """Registrar atendimento para ID inexistente deve retornar False com mensagem 'não encontrada'."""
+    """Registrar atendimento para ID inexistente deve retornar
+    False com mensagem 'não encontrada'.
+    """
     ok, msg = registrar_atendimento(99999, "Consulta")
     assert ok is False
     assert "não encontrada" in msg.lower()
@@ -50,13 +55,16 @@ def test_registrar_atendimento_descricao_vazia():
 
 # ─── listar_atendimentos ──────────────────────────────────────────────────────
 
+
 def test_listar_atendimentos_vazio():
     """Banco recém-criado deve retornar lista vazia de atendimentos."""
     assert listar_atendimentos() == []
 
 
 def test_listar_atendimentos_retorna_dataclass():
-    """Confirma que o resultado é lista de Atendimento com pessoa_nome preenchido pelo JOIN."""
+    """Confirma que o resultado é lista de Atendimento com pessoa_nome
+    preenchido pelo JOIN.
+    """
     pid = _criar_pessoa()
     registrar_atendimento(pid, "Primeiro atendimento")
     ats = listar_atendimentos()
@@ -73,6 +81,7 @@ def test_atendimento_criado_com_status_aberto():
 
 
 # ─── atualizar_status_atendimento ─────────────────────────────────────────────
+
 
 @pytest.mark.parametrize("status", ["aberto", "em andamento", "finalizado"])
 def test_atualizar_para_status_valido(status):
@@ -103,8 +112,11 @@ def test_atualizar_status_atendimento_inexistente():
 
 # ─── regra de negócio: exclusão bloqueada ────────────────────────────────────
 
+
 def test_excluir_pessoa_com_atendimento_aberto_bloqueado():
-    """Não deve ser possível excluir pessoa com atendimento 'aberto' ou 'em andamento'."""
+    """Não deve ser possível excluir pessoa com atendimento
+    'aberto' ou 'em andamento'.
+    """
     pid = _criar_pessoa()
     registrar_atendimento(pid, "Atendimento ativo")
     ok, msg = excluir_pessoa(pid)

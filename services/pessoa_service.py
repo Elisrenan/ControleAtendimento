@@ -15,8 +15,9 @@ Chamado por:
 Chama:
     infrastructure/repositories/pessoa_repository.py → todas as funções
 """
-from infrastructure.repositories import pessoa_repository
+
 from domain.models import Pessoa
+from infrastructure.repositories import pessoa_repository
 
 
 def cadastrar_pessoa(nome, cpf, telefone):
@@ -98,7 +99,10 @@ def excluir_pessoa(pessoa_id):
     """
     total_ativos = pessoa_repository.contar_atendimentos_ativos(pessoa_id)
     if total_ativos > 0:
-        return False, "Não é possível excluir pessoa com atendimento aberto ou em andamento."
+        return (
+            False,
+            "Não é possível excluir pessoa com atendimento aberto ou em andamento.",
+        )
 
     removido = pessoa_repository.excluir(pessoa_id)
 

@@ -19,7 +19,9 @@ Estágio de isolamento:
     O DB_PATH do módulo infrastructure.database é substituído via monkeypatch,
     garantindo que os testes nunca toquem no banco de produção.
 """
+
 import pytest
+
 import infrastructure.database as db_module
 
 

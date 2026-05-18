@@ -12,11 +12,11 @@ Chama:
     infrastructure/database.py → conectar()
     domain/models.py           → Atendimento
 """
+
 from typing import List
 
-from infrastructure.database import conectar
 from domain.models import Atendimento
-
+from infrastructure.database import conectar
 
 STATUS_PERMITIDOS = ["aberto", "em andamento", "finalizado"]
 
@@ -46,7 +46,8 @@ def listar_todos() -> List[Atendimento]:
     com o resultado do INNER JOIN na tabela 'pessoas'.
 
     Returns:
-        Lista de objetos Atendimento ordenada por ID decrescente (mais recente primeiro).
+        Lista de objetos Atendimento ordenada por ID decrescente
+        (mais recente primeiro).
     """
     conexao = conectar()
     cursor = conexao.cursor()
@@ -67,8 +68,14 @@ def listar_todos() -> List[Atendimento]:
     conexao.close()
 
     return [
-        Atendimento(id=l[0], pessoa_id=l[1], descricao=l[2], status=l[3], pessoa_nome=l[4])
-        for l in linhas
+        Atendimento(
+            id=row[0],
+            pessoa_id=row[1],
+            descricao=row[2],
+            status=row[3],
+            pessoa_nome=row[4],
+        )
+        for row in linhas
     ]
 
 
@@ -77,7 +84,8 @@ def atualizar_status(atendimento_id: int, novo_status: str) -> bool:
 
     Args:
         atendimento_id: ID do atendimento a atualizar.
-        novo_status   : Novo valor do status (validação dos valores possíveis é feita no service).
+        novo_status   : Novo valor do status (validação dos valores
+                         possíveis é feita no service).
 
     Returns:
         True se o atendimento foi encontrado e atualizado, False caso contrário.

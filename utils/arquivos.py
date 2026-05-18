@@ -4,6 +4,7 @@ Utilidades de arquivos — leitura e escrita em JSON.
 Chamado por:
     ui/cli.py → salvar_json()
 """
+
 import json
 
 

@@ -15,17 +15,18 @@ Chama:
                                            atualizar_status_atendimento
     utils/arquivos.py                   → salvar_json
 """
+
 from infrastructure.database import criar_tabelas
-from services.pessoa_service import (
-    cadastrar_pessoa,
-    listar_pessoas,
-    buscar_pessoa_por_nome_ou_cpf,
-    excluir_pessoa,
-)
 from services.atendimento_service import (
-    registrar_atendimento,
-    listar_atendimentos,
     atualizar_status_atendimento,
+    listar_atendimentos,
+    registrar_atendimento,
+)
+from services.pessoa_service import (
+    buscar_pessoa_por_nome_ou_cpf,
+    cadastrar_pessoa,
+    excluir_pessoa,
+    listar_pessoas,
 )
 from utils.arquivos import salvar_json
 
@@ -56,7 +57,10 @@ def imprimir_pessoas(pessoas):
         return
 
     for pessoa in pessoas:
-        print(f"ID: {pessoa.id} | Nome: {pessoa.nome} | CPF: {pessoa.cpf} | Telefone: {pessoa.telefone}")
+        print(
+            f"ID: {pessoa.id} | Nome: {pessoa.nome} "
+            f"| CPF: {pessoa.cpf} | Telefone: {pessoa.telefone}"
+        )
 
 
 def imprimir_atendimentos(atendimentos):
@@ -124,10 +128,12 @@ def menu_listar_atendimentos():
 
 
 def menu_atualizar_status():
-    """Solicita o ID do atendimento e o novo status, e chama atualizar_status_atendimento().
+    """Solicita o ID do atendimento e o novo status, e chama
+    atualizar_status_atendimento().
 
-    Apresenta as opções numéricas (1, 2, 3) e converte para o valor correto de status.
-    Trata ValueError se o usuário digitar um ID não numérico.
+    Apresenta as opções numéricas (1, 2, 3) e converte para o valor
+    correto de status. Trata ValueError se o usuário digitar um ID
+    não numérico.
     """
     try:
         atendimento_id = int(input("ID do atendimento: "))
@@ -188,7 +194,12 @@ def menu_exportar_json():
     ]
 
     atendimentos_json = [
-        {"id": a.id, "pessoa": a.pessoa_nome, "descricao": a.descricao, "status": a.status}
+        {
+            "id": a.id,
+            "pessoa": a.pessoa_nome,
+            "descricao": a.descricao,
+            "status": a.status,
+        }
         for a in atendimentos
     ]
 

@@ -14,20 +14,20 @@ Chama:
     services/atendimento_service.py     → registrar_atendimento, listar_atendimentos,
                                            atualizar_status_atendimento
 """
+
 import tkinter as tk
 from tkinter import messagebox
 
-from infrastructure.database import criar_tabelas
-from services.pessoa_service import (
-    cadastrar_pessoa,
-    listar_pessoas,
-    buscar_pessoa_por_nome_ou_cpf,
-    excluir_pessoa,
-)
 from services.atendimento_service import (
-    registrar_atendimento,
-    listar_atendimentos,
     atualizar_status_atendimento,
+    listar_atendimentos,
+    registrar_atendimento,
+)
+from services.pessoa_service import (
+    buscar_pessoa_por_nome_ou_cpf,
+    cadastrar_pessoa,
+    excluir_pessoa,
+    listar_pessoas,
 )
 
 
@@ -93,8 +93,10 @@ def iniciar_gui():
         for atendimento in atendimentos:
             lista_resultados.insert(
                 tk.END,
-                f"Atendimento | ID: {atendimento.id} | Pessoa: {atendimento.pessoa_nome} | "
-                f"Descrição: {atendimento.descricao} | Status: {atendimento.status}",
+                f"Atendimento | ID: {atendimento.id}"
+                f" | Pessoa: {atendimento.pessoa_nome}"
+                f" | Descrição: {atendimento.descricao}"
+                f" | Status: {atendimento.status}",
             )
 
     # =========================================================
@@ -201,9 +203,9 @@ def iniciar_gui():
     entry_telefone = tk.Entry(frame_pessoa, width=20)
     entry_telefone.grid(row=0, column=5, padx=5)
 
-    tk.Button(frame_pessoa, text="Cadastrar Pessoa", command=acao_cadastrar_pessoa).grid(
-        row=0, column=6, padx=5
-    )
+    tk.Button(
+        frame_pessoa, text="Cadastrar Pessoa", command=acao_cadastrar_pessoa
+    ).grid(row=0, column=6, padx=5)
 
     # =========================================================
     # FRAME BUSCA E EXCLUSÃO
@@ -215,8 +217,12 @@ def iniciar_gui():
     entry_busca = tk.Entry(frame_busca, width=30)
     entry_busca.grid(row=0, column=1, padx=5)
 
-    tk.Button(frame_busca, text="Buscar", command=acao_buscar_pessoa).grid(row=0, column=2, padx=5)
-    tk.Button(frame_busca, text="Listar Pessoas", command=exibir_pessoas).grid(row=0, column=3, padx=5)
+    tk.Button(frame_busca, text="Buscar", command=acao_buscar_pessoa).grid(
+        row=0, column=2, padx=5
+    )
+    tk.Button(frame_busca, text="Listar Pessoas", command=exibir_pessoas).grid(
+        row=0, column=3, padx=5
+    )
 
     tk.Label(frame_busca, text="ID para excluir").grid(row=0, column=4)
     entry_excluir_id = tk.Entry(frame_busca, width=10)
@@ -229,7 +235,9 @@ def iniciar_gui():
     # =========================================================
     # FRAME REGISTRO DE ATENDIMENTO
     # =========================================================
-    frame_atendimento = tk.LabelFrame(janela, text="Registro de Atendimento", padx=10, pady=10)
+    frame_atendimento = tk.LabelFrame(
+        janela, text="Registro de Atendimento", padx=10, pady=10
+    )
     frame_atendimento.pack(fill="x", padx=10, pady=5)
 
     tk.Label(frame_atendimento, text="ID Pessoa").grid(row=0, column=0)
@@ -241,7 +249,9 @@ def iniciar_gui():
     entry_descricao.grid(row=0, column=3, padx=5)
 
     tk.Button(
-        frame_atendimento, text="Registrar Atendimento", command=acao_registrar_atendimento
+        frame_atendimento,
+        text="Registrar Atendimento",
+        command=acao_registrar_atendimento,
     ).grid(row=0, column=4, padx=5)
 
     tk.Button(
@@ -260,13 +270,13 @@ def iniciar_gui():
 
     status_var = tk.StringVar(value="aberto")
 
-    tk.OptionMenu(frame_status, status_var, "aberto", "em andamento", "finalizado").grid(
-        row=0, column=2, padx=5
-    )
+    tk.OptionMenu(
+        frame_status, status_var, "aberto", "em andamento", "finalizado"
+    ).grid(row=0, column=2, padx=5)
 
-    tk.Button(frame_status, text="Atualizar Status", command=acao_atualizar_status).grid(
-        row=0, column=3, padx=5
-    )
+    tk.Button(
+        frame_status, text="Atualizar Status", command=acao_atualizar_status
+    ).grid(row=0, column=3, padx=5)
 
     # =========================================================
     # FRAME RESULTADOS (empacotado aqui para ocupar o espaço restante)

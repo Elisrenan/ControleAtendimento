@@ -7,12 +7,13 @@ O banco de dados é substituído por um banco temporário via conftest.py.
 Fluxo testado:
     test → pessoa_service → pessoa_repository → SQLite (temporário)
 """
+
 from services.pessoa_service import (
-    cadastrar_pessoa,
-    listar_pessoas,
-    buscar_pessoa_por_nome_ou_cpf,
     buscar_pessoa_por_id,
+    buscar_pessoa_por_nome_ou_cpf,
+    cadastrar_pessoa,
     excluir_pessoa,
+    listar_pessoas,
 )
 
 
@@ -50,7 +51,9 @@ def test_listar_pessoas_vazio():
 
 
 def test_listar_pessoas_retorna_dataclass():
-    """Confirma que os registros retornados são objetos Pessoa com atributos nomeados."""
+    """Confirma que os registros retornados são objetos Pessoa
+    com atributos nomeados.
+    """
     cadastrar_pessoa("Carlos", "222.333.444-55", "")
     pessoas = listar_pessoas()
     assert len(pessoas) == 1
@@ -102,7 +105,9 @@ def test_buscar_por_id_inexistente():
 
 
 def test_excluir_pessoa_sem_atendimento():
-    """Pessoa sem atendimentos deve poder ser excluída. Após a exclusão o banco fica vazio."""
+    """Pessoa sem atendimentos deve poder ser excluída.
+    Após a exclusão o banco fica vazio.
+    """
     cadastrar_pessoa("Pedro", "666.777.888-99", "")
     pessoa_id = listar_pessoas()[0].id
     ok, msg = excluir_pessoa(pessoa_id)

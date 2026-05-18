@@ -16,9 +16,9 @@ Chama:
     infrastructure/repositories/atendimento_repository.py → todas as funções
     infrastructure/repositories/pessoa_repository.py      → buscar_por_id()
 """
-from infrastructure.repositories import atendimento_repository, pessoa_repository
-from domain.models import Atendimento
 
+from domain.models import Atendimento
+from infrastructure.repositories import atendimento_repository, pessoa_repository
 
 STATUS_PERMITIDOS = ["aberto", "em andamento", "finalizado"]
 
@@ -48,7 +48,9 @@ def registrar_atendimento(pessoa_id, descricao):
         return False, "A descrição do atendimento é obrigatória."
 
     try:
-        atendimento = Atendimento(pessoa_id=pessoa_id, descricao=descricao, status="aberto")
+        atendimento = Atendimento(
+            pessoa_id=pessoa_id, descricao=descricao, status="aberto"
+        )
         atendimento_repository.inserir(atendimento)
         return True, "Atendimento registrado com sucesso."
 
