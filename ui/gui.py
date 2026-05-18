@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 
-from database import criar_tabelas
+from infrastructure.database import criar_tabelas
 from services.pessoa_service import (
     cadastrar_pessoa,
     listar_pessoas,
@@ -52,8 +52,8 @@ def iniciar_gui():
         for pessoa in pessoas:
             lista_resultados.insert(
                 tk.END,
-                f"Pessoa | ID: {pessoa[0]} | Nome: {pessoa[1]} | "
-                f"CPF: {pessoa[2]} | Telefone: {pessoa[3]}",
+                f"Pessoa | ID: {pessoa.id} | Nome: {pessoa.nome} | "
+                f"CPF: {pessoa.cpf} | Telefone: {pessoa.telefone}",
             )
 
     def exibir_atendimentos():
@@ -67,8 +67,8 @@ def iniciar_gui():
         for atendimento in atendimentos:
             lista_resultados.insert(
                 tk.END,
-                f"Atendimento | ID: {atendimento[0]} | Pessoa: {atendimento[1]} | "
-                f"Descrição: {atendimento[2]} | Status: {atendimento[3]}",
+                f"Atendimento | ID: {atendimento.id} | Pessoa: {atendimento.pessoa_nome} | "
+                f"Descrição: {atendimento.descricao} | Status: {atendimento.status}",
             )
 
     # =========================================================
@@ -102,8 +102,8 @@ def iniciar_gui():
         for pessoa in pessoas:
             lista_resultados.insert(
                 tk.END,
-                f"Pessoa | ID: {pessoa[0]} | Nome: {pessoa[1]} | "
-                f"CPF: {pessoa[2]} | Telefone: {pessoa[3]}",
+                f"Pessoa | ID: {pessoa.id} | Nome: {pessoa.nome} | "
+                f"CPF: {pessoa.cpf} | Telefone: {pessoa.telefone}",
             )
 
     def acao_excluir_pessoa():

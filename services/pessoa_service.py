@@ -1,4 +1,5 @@
-from database import conectar
+from infrastructure.repositories import pessoa_repository
+from domain.models import Pessoa
 
 
 def cadastrar_pessoa(nome, cpf, telefone):
@@ -8,97 +9,36 @@ def cadastrar_pessoa(nome, cpf, telefone):
     if not cpf.strip():
         return False, "O CPF é obrigatório."
 
-    conexao = conectar()
-    cursor = conexao.cursor()
-
     try:
-        cursor.execute("""
-            INSERT INTO pessoas (nome, cpf, telefone)
-            VALUES (?, ?, ?)
-        """, (nome, cpf, telefone))
-
-        conexao.commit()
+        pessoa = Pessoa(nome=nome, cpf=cpf, telefone=telefone)
+        pessoa_repository.inserir(pessoa)
         return True, "Pessoa cadastrada com sucesso."
 
     except Exception as erro:
         return False, f"Erro ao cadastrar pessoa: {erro}"
 
-    finally:
-        conexao.close()
-
 
 def listar_pessoas():
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-        SELECT id, nome, cpf, telefone
-        FROM pessoas
-        ORDER BY nome
-    """)
-
-    pessoas = cursor.fetchall()
-    conexao.close()
-
-    return pessoas
+    return pessoa_repository.listar_todos()
 
 
 def buscar_pessoa_por_nome_ou_cpf(termo):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-        SELECT id, nome, cpf, telefone
-        FROM pessoas
-        WHERE nome LIKE ? OR cpf LIKE ?
-        ORDER BY nome
-    """, (f"%{termo}%", f"%{termo}%"))
-
-    pessoas = cursor.fetchall()
-    conexao.close()
-
-    return pessoas
+    return pessoa_repository.buscar_por_nome_ou_cpf(termo)
 
 
 def buscar_pessoa_por_id(pessoa_id):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-        SELECT id, nome, cpf, telefone
-        FROM pessoas
-        WHERE id = ?
-    """, (pessoa_id,))
-
-    pessoa = cursor.fetchone()
-    conexao.close()
-
-    return pessoa
+    return pessoa_repository.buscar_por_id(pessoa_id)
 
 
 def excluir_pessoa(pessoa_id):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-        SELECT COUNT(*)
-        FROM atendimentos
-        WHERE pessoa_id = ? AND status IN ('aberto', 'em andamento')
-    """, (pessoa_id,))
-
-    total_ativos = cursor.fetchone()[0]
+    total_ativos = pessoa_repository.contar_atendimentos_ativos(pessoa_id)
 
     if total_ativos > 0:
-        conexao.close()
         return False, "Não é possível excluir pessoa com atendimento aberto ou em andamento."
 
-    cursor.execute("DELETE FROM pessoas WHERE id = ?", (pessoa_id,))
+    removido = pessoa_repository.excluir(pessoa_id)
 
-    if cursor.rowcount == 0:
-        conexao.close()
+    if not removido:
         return False, "Pessoa não encontrada."
-
-    conexao.commit()
-    conexao.close()
 
     return True, "Pessoa excluída com sucesso."

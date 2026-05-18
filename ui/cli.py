@@ -1,4 +1,4 @@
-from database import criar_tabelas
+from infrastructure.database import criar_tabelas
 from services.pessoa_service import (
     cadastrar_pessoa,
     listar_pessoas,
@@ -32,7 +32,7 @@ def imprimir_pessoas(pessoas):
         return
 
     for pessoa in pessoas:
-        print(f"ID: {pessoa[0]} | Nome: {pessoa[1]} | CPF: {pessoa[2]} | Telefone: {pessoa[3]}")
+        print(f"ID: {pessoa.id} | Nome: {pessoa.nome} | CPF: {pessoa.cpf} | Telefone: {pessoa.telefone}")
 
 
 def imprimir_atendimentos(atendimentos):
@@ -42,8 +42,8 @@ def imprimir_atendimentos(atendimentos):
 
     for atendimento in atendimentos:
         print(
-            f"ID: {atendimento[0]} | Pessoa: {atendimento[1]} | "
-            f"Descrição: {atendimento[2]} | Status: {atendimento[3]}"
+            f"ID: {atendimento.id} | Pessoa: {atendimento.pessoa_nome} | "
+            f"Descrição: {atendimento.descricao} | Status: {atendimento.status}"
         )
 
 
@@ -129,12 +129,12 @@ def menu_exportar_json():
     atendimentos = listar_atendimentos()
 
     pessoas_json = [
-        {"id": p[0], "nome": p[1], "cpf": p[2], "telefone": p[3]}
+        {"id": p.id, "nome": p.nome, "cpf": p.cpf, "telefone": p.telefone}
         for p in pessoas
     ]
 
     atendimentos_json = [
-        {"id": a[0], "pessoa": a[1], "descricao": a[2], "status": a[3]}
+        {"id": a.id, "pessoa": a.pessoa_nome, "descricao": a.descricao, "status": a.status}
         for a in atendimentos
     ]
 
