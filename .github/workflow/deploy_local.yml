@@ -1,0 +1,73 @@
+name: Deploy Local
+on:
+  push:
+    paths:
+      - 'services/pets_api/**'
+      - '.github/workflows/develop.yml'
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.12]
+        poetry-version: [1.8.4]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      ALLOWED_ORIGINS: '*'
+    defaults:
+      run:
+        working-directory: services/pets_api/tests
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Update poetry lock file
+        run: poetry lock --no-update
+      - name: Install dependencies
+        run: poetry install --no-root
+      - name: Run tests
+        run: poetry run pytest *.py --cov=./ --cov-report=xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  code-quality:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.12]
+        poetry-version: [1.8.4]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: services/pets_api
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Update poetry lock file
+        run: poetry lock --no-update
+      - name: Install dependencies
+        run: poetry install --no-root
+      - name: Run black
+        run: poetry run black . --check
+      - name: Run isort
+        run: poetry run isort . --profile black --check-only
+      - name: Run flake8
+        run: poetry run flake8 .
+      - name: Run bandit
+        run: poetry run bandit .

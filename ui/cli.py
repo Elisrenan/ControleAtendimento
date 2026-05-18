@@ -1,3 +1,20 @@
+"""
+Camada de Apresentação — interface de terminal (CLI).
+
+Menu interativo no terminal. Não contém SQL nem regras de negócio:
+delega tudo aos services e apenas exibe o resultado ao usuário.
+
+Chamado por:
+    main.py → executar()
+
+Chama:
+    infrastructure/database.py          → criar_tabelas()
+    services/pessoa_service.py          → cadastrar_pessoa, listar_pessoas,
+                                           buscar_pessoa_por_nome_ou_cpf, excluir_pessoa
+    services/atendimento_service.py     → registrar_atendimento, listar_atendimentos,
+                                           atualizar_status_atendimento
+    utils/arquivos.py                   → salvar_json
+"""
 from infrastructure.database import criar_tabelas
 from services.pessoa_service import (
     cadastrar_pessoa,
@@ -14,7 +31,7 @@ from utils.arquivos import salvar_json
 
 
 def mostrar_menu():
-    print("\n===== Sistema RAD de Controle de Atendimentos =====")
+    """Imprime o menu principal no terminal com todas as opções disponíveis."""
     print("1 - Cadastrar pessoa")
     print("2 - Listar pessoas")
     print("3 - Buscar pessoa por nome ou CPF")
@@ -27,6 +44,13 @@ def mostrar_menu():
 
 
 def imprimir_pessoas(pessoas):
+    """Imprime uma lista de pessoas no terminal, uma por linha.
+
+    Exibe mensagem informativa se a lista estiver vazia.
+
+    Args:
+        pessoas: lista de objetos Pessoa.
+    """
     if not pessoas:
         print("Nenhuma pessoa encontrada.")
         return
@@ -36,6 +60,13 @@ def imprimir_pessoas(pessoas):
 
 
 def imprimir_atendimentos(atendimentos):
+    """Imprime uma lista de atendimentos no terminal, um por linha.
+
+    Exibe mensagem informativa se a lista estiver vazia.
+
+    Args:
+        atendimentos: lista de objetos Atendimento.
+    """
     if not atendimentos:
         print("Nenhum atendimento encontrado.")
         return
@@ -48,6 +79,7 @@ def imprimir_atendimentos(atendimentos):
 
 
 def menu_cadastrar_pessoa():
+    """Coleta nome, CPF e telefone via input e chama cadastrar_pessoa()."""
     nome = input("Nome: ")
     cpf = input("CPF: ")
     telefone = input("Telefone: ")
@@ -57,17 +89,23 @@ def menu_cadastrar_pessoa():
 
 
 def menu_listar_pessoas():
+    """Lista todas as pessoas cadastradas no banco."""
     pessoas = listar_pessoas()
     imprimir_pessoas(pessoas)
 
 
 def menu_buscar_pessoa():
-    termo = input("Digite nome ou CPF: ")
+    """Solicita um termo ao usuário e exibe as pessoas encontradas por nome ou CPF."""
+    termo = input("Buscar por nome ou CPF: ")
     pessoas = buscar_pessoa_por_nome_ou_cpf(termo)
     imprimir_pessoas(pessoas)
 
 
 def menu_registrar_atendimento():
+    """Coleta ID da pessoa e descrição via input e chama registrar_atendimento().
+
+    Trata ValueError se o usuário digitar um ID não numérico.
+    """
     try:
         pessoa_id = int(input("ID da pessoa: "))
         descricao = input("Descrição do atendimento: ")
@@ -80,11 +118,17 @@ def menu_registrar_atendimento():
 
 
 def menu_listar_atendimentos():
+    """Lista todos os atendimentos cadastrados no banco."""
     atendimentos = listar_atendimentos()
     imprimir_atendimentos(atendimentos)
 
 
 def menu_atualizar_status():
+    """Solicita o ID do atendimento e o novo status, e chama atualizar_status_atendimento().
+
+    Apresenta as opções numéricas (1, 2, 3) e converte para o valor correto de status.
+    Trata ValueError se o usuário digitar um ID não numérico.
+    """
     try:
         atendimento_id = int(input("ID do atendimento: "))
 
@@ -115,8 +159,12 @@ def menu_atualizar_status():
 
 
 def menu_excluir_pessoa():
+    """Solicita o ID da pessoa e chama excluir_pessoa().
+
+    Trata ValueError se o usuário digitar um ID não numérico.
+    """
     try:
-        pessoa_id = int(input("ID da pessoa que deseja excluir: "))
+        pessoa_id = int(input("ID da pessoa: "))
         sucesso, mensagem = excluir_pessoa(pessoa_id)
         print(mensagem)
 
@@ -125,6 +173,12 @@ def menu_excluir_pessoa():
 
 
 def menu_exportar_json():
+    """Exporta todos os dados para arquivos JSON no diretório corrente.
+
+    Gera dois arquivos:
+        pessoas.json      — lista de todas as pessoas.
+        atendimentos.json — lista de todos os atendimentos.
+    """
     pessoas = listar_pessoas()
     atendimentos = listar_atendimentos()
 
@@ -145,6 +199,11 @@ def menu_exportar_json():
 
 
 def executar():
+    """Inicializa o banco e entra no loop principal do menu CLI.
+
+    Mapeia cada opção numérica para sua função de ação correspondente.
+    O loop só termina quando o usuário escolhe a opção 9 (Sair).
+    """
     criar_tabelas()
 
     opcoes = {

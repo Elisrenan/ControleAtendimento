@@ -1,3 +1,17 @@
+"""
+Repositório de Atendimentos — acesso ao banco de dados SQLite.
+
+Contém exclusivamente SQL relacionado à tabela 'atendimentos'.
+Não há regras de negócio aqui — apenas operações de banco.
+Recebe e retorna objetos Atendimento (domain/models.py).
+
+Chamado por:
+    services/atendimento_service.py → todas as funções
+
+Chama:
+    infrastructure/database.py → conectar()
+    domain/models.py           → Atendimento
+"""
 from typing import List
 
 from infrastructure.database import conectar
@@ -8,6 +22,11 @@ STATUS_PERMITIDOS = ["aberto", "em andamento", "finalizado"]
 
 
 def inserir(atendimento: Atendimento) -> None:
+    """Insere um novo atendimento no banco de dados.
+
+    Args:
+        atendimento: objeto Atendimento com pessoa_id, descricao e status preenchidos.
+    """
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -21,6 +40,14 @@ def inserir(atendimento: Atendimento) -> None:
 
 
 def listar_todos() -> List[Atendimento]:
+    """Retorna todos os atendimentos com o nome da pessoa via JOIN.
+
+    O campo pessoa_nome de cada objeto Atendimento é preenchido
+    com o resultado do INNER JOIN na tabela 'pessoas'.
+
+    Returns:
+        Lista de objetos Atendimento ordenada por ID decrescente (mais recente primeiro).
+    """
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -46,6 +73,15 @@ def listar_todos() -> List[Atendimento]:
 
 
 def atualizar_status(atendimento_id: int, novo_status: str) -> bool:
+    """Atualiza o status de um atendimento existente.
+
+    Args:
+        atendimento_id: ID do atendimento a atualizar.
+        novo_status   : Novo valor do status (validação dos valores possíveis é feita no service).
+
+    Returns:
+        True se o atendimento foi encontrado e atualizado, False caso contrário.
+    """
     conexao = conectar()
     cursor = conexao.cursor()
 

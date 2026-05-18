@@ -1,3 +1,24 @@
+"""
+Configurações globais do pytest.
+
+Como rodar os testes:
+    # Todos os testes
+    python -m pytest tests/ -v
+
+    # Apenas os testes de pessoa
+    python -m pytest tests/test_pessoa_service.py -v
+
+    # Apenas os testes de atendimento
+    python -m pytest tests/test_atendimento_service.py -v
+
+    # Com relatório de cobertura (requer pytest-cov)
+    python -m pytest tests/ --cov=services -v
+
+Estágio de isolamento:
+    Cada teste recebe um banco SQLite vazio e temporário (tmp_path do pytest).
+    O DB_PATH do módulo infrastructure.database é substituído via monkeypatch,
+    garantindo que os testes nunca toquem no banco de produção.
+"""
 import pytest
 import infrastructure.database as db_module
 

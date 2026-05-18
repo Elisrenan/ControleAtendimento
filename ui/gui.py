@@ -1,3 +1,19 @@
+"""
+Camada de Apresentação — interface gráfica (Tkinter).
+
+Toda a interface está encapsulada em iniciar_gui().
+Não contém SQL nem regras de negócio: delega tudo aos services.
+
+Chamado por:
+    main.py → iniciar_gui()
+
+Chama:
+    infrastructure/database.py          → criar_tabelas()
+    services/pessoa_service.py          → cadastrar_pessoa, listar_pessoas,
+                                           buscar_pessoa_por_nome_ou_cpf, excluir_pessoa
+    services/atendimento_service.py     → registrar_atendimento, listar_atendimentos,
+                                           atualizar_status_atendimento
+"""
 import tkinter as tk
 from tkinter import messagebox
 
@@ -16,7 +32,17 @@ from services.atendimento_service import (
 
 
 def iniciar_gui():
-    criar_tabelas()
+    """Constrói e exibe a janela principal do sistema.
+
+    Organiza a interface em quatro frames funcionais:
+        - Cadastro de Pessoa
+        - Busca e Exclusão
+        - Registro de Atendimento + Atualização de Status
+        - Resultados (Listbox com exibição centralizada)
+
+    Todas as funções de ação são closures internas que capturam os widgets
+    locais e chamam os services correspondentes.
+    """
 
     janela = tk.Tk()
     janela.title("Sistema RAD de Controle de Atendimentos")

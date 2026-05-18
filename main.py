@@ -1,8 +1,22 @@
+"""
+Ponto de entrada da aplicação.
+
+Escolhe a interface a executar com base nos argumentos da linha de comando:
+    python main.py        → interface de terminal (CLI)
+    python main.py --gui  → interface gráfica (Tkinter)
+
+Sempre inicializa o banco de dados antes de lançar a interface.
+
+Chama:
+    infrastructure/database.py → criar_tabelas()
+    ui/cli.py                  → executar()
+    ui/gui.py                  → iniciar_gui()
+"""
 import sys
 
 
 def main():
-    from infrastructure.database import criar_tabelas
+    """Inicializa o banco e lança a interface escolhida pelo argumento --gui."""
     criar_tabelas()
 
     if "--gui" in sys.argv:
