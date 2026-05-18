@@ -14,11 +14,13 @@ Desenvolvido na disciplina de **Desenvolvimento Rápido de Aplicações (RAD) co
 4. [Estrutura do Projeto](#4-estrutura-do-projeto)
 5. [Pré-requisitos](#5-pré-requisitos)
 6. [Como Executar](#6-como-executar)
-7. [Camadas da Aplicação — Detalhamento](#7-camadas-da-aplicação--detalhamento)
-8. [Banco de Dados](#8-banco-de-dados)
-9. [Regras de Negócio](#9-regras-de-negócio)
-10. [Conceitos Aplicados](#10-conceitos-aplicados)
-11. [Regra de Ouro da Arquitetura](#11-regra-de-ouro-da-arquitetura)
+7. [Testes e Qualidade de Código](#7-testes-e-qualidade-de-código)
+8. [Integração Contínua (CI)](#8-integração-contínua-ci)
+9. [Camadas da Aplicação — Detalhamento](#9-camadas-da-aplicação--detalhamento)
+10. [Banco de Dados](#10-banco-de-dados)
+11. [Regras de Negócio](#11-regras-de-negócio)
+12. [Conceitos Aplicados](#12-conceitos-aplicados)
+13. [Regra de Ouro da Arquitetura](#13-regra-de-ouro-da-arquitetura)
 
 ---
 
@@ -115,7 +117,21 @@ ControleAtendimento/
 │
 ├── utils/
 │   ├── __init__.py
-│   └── arquivos.py                      # Leitura e escrita de arquivos JSON
+│   └── arquivos.py                      # Escrita de arquivos JSON
+│
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py                      # Fixture de banco temporário (pytest)
+│   ├── test_pessoa_service.py           # 14 testes unitários de pessoas
+│   └── test_atendimento_service.py      # 13 testes unitários de atendimentos
+│
+├── .github/
+│   └── workflows/
+│       └── deploy_local.yml             # Pipeline CI/CD (GitHub Actions)
+│
+├── requirements-dev.txt                 # Dependências de desenvolvimento
+├── pyproject.toml                       # Configuração de black, isort e bandit
+├── .flake8                              # Configuração do linter flake8
 │
 ├── controle_atendimentos.db             # Banco SQLite (gerado na primeira execução)
 ├── pessoas.json                         # Exportação de pessoas (gerado sob demanda)
@@ -127,7 +143,7 @@ ControleAtendimento/
 ## 5. Pré-requisitos
 
 - Python 3.8 ou superior
-- **Zero dependências externas** — apenas bibliotecas da stdlib:
+- **Zero dependências externas para executar** — apenas bibliotecas da stdlib:
 
 | Biblioteca | Uso |
 |---|---|
@@ -136,6 +152,12 @@ ControleAtendimento/
 | `dataclasses` | Definição das entidades de domínio |
 | `json` | Exportação de dados |
 | `pathlib` | Caminho do banco de dados |
+
+**Para desenvolvimento e testes**, instale as ferramentas com:
+
+```bash
+pip install -r requirements-dev.txt
+```
 
 ---
 
@@ -157,7 +179,96 @@ O banco de dados `controle_atendimentos.db` é criado automaticamente na primeir
 
 ---
 
-## 7. Camadas da Aplicação — Detalhamento
+## 7. Testes e Qualidade de Código
+
+### Instalar as ferramentas
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+### Rodar os testes
+
+```bash
+# Todos os testes
+python -m pytest tests/ -v
+
+# Com relatório de cobertura
+python -m pytest tests/ --cov=. --cov-report=term-missing -v
+```
+
+O projeto possui **27 testes unitários** distribuídos em dois arquivos:
+
+| Arquivo | Testes | O que cobre |
+|---|---|---|
+| `tests/test_pessoa_service.py` | 14 | Cadastro, listagem, busca, exclusão de pessoas |
+| `tests/test_atendimento_service.py` | 13 | Registro, listagem, status, regra de bloqueio |
+
+**Isolamento de banco:** cada teste recebe um banco SQLite vazio e temporário via `conftest.py`, garantindo que os testes nunca afetam o banco de produção.
+
+### Verificar qualidade do código
+
+```bash
+# Formatação (black)
+python -m black . --check
+
+# Ordenação de imports (isort)
+python -m isort . --profile black --check-only
+
+# Linting (flake8)
+python -m flake8 .
+
+# Segurança (bandit)
+python -m bandit -r domain/ infrastructure/ services/ utils/ ui/ main.py
+```
+
+Para aplicar a formatação automaticamente (sem `--check`):
+
+```bash
+python -m black .
+python -m isort . --profile black
+```
+
+---
+
+## 8. Integração Contínua (CI)
+
+O projeto usa **GitHub Actions** com o arquivo `.github/workflows/deploy_local.yml`.
+
+### Gatilhos
+
+O pipeline é acionado automaticamente em **qualquer branch** a cada `push` ou `pull_request`:
+
+```yaml
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+```
+
+### Jobs
+
+| Job | Ferramenta | O que verifica |
+|---|---|---|
+| `test` | pytest + pytest-cov | 27 testes passando + relatório de cobertura enviado ao Codecov |
+| `code-quality` | black, isort, flake8, bandit | Formatação, imports, linting e segurança |
+
+### Configurar o `CODECOV_TOKEN`
+
+O job de testes envia o relatório de cobertura para o [Codecov](https://codecov.io). Para isso, é necessário configurar um *secret* no repositório GitHub:
+
+1. Acesse [codecov.io](https://codecov.io) e faça login com sua conta GitHub
+2. Adicione o repositório e copie o **Upload Token**
+3. No GitHub, vá em **Settings → Secrets and variables → Actions**
+4. Clique em **New repository secret**
+5. Nome: `CODECOV_TOKEN` — Valor: o token copiado do Codecov
+
+> **Sem o token configurado**, o step de upload falha mas os testes continuam rodando normalmente — o `fail-fast: false` garante que o job não para nos testes.
+
+---
+
+## 9. Camadas da Aplicação — Detalhamento
 
 ### `domain/models.py` — Entidades de Domínio
 
@@ -274,12 +385,11 @@ Toda a interface encapsulada em `iniciar_gui()`. Funções de ação são closur
 
 ```python
 def salvar_json(nome_arquivo, dados):   # Serializa lista de dicts para JSON
-def carregar_json(nome_arquivo):        # Lê JSON com fallback para [] se não existir
 ```
 
 ---
 
-## 8. Banco de Dados
+## 10. Banco de Dados
 
 Banco SQLite local (`controle_atendimentos.db`) com duas tabelas:
 
@@ -305,7 +415,7 @@ Banco SQLite local (`controle_atendimentos.db`) com duas tabelas:
 
 ---
 
-## 9. Regras de Negócio
+## 11. Regras de Negócio
 
 - Nome e CPF são obrigatórios no cadastro de pessoa.
 - CPF deve ser único no sistema.
@@ -316,7 +426,7 @@ Banco SQLite local (`controle_atendimentos.db`) com duas tabelas:
 
 ---
 
-## 10. Conceitos Aplicados
+## 12. Conceitos Aplicados
 
 | Conceito Python | Onde é utilizado |
 |---|---|
@@ -337,7 +447,7 @@ Banco SQLite local (`controle_atendimentos.db`) com duas tabelas:
 
 ---
 
-## 11. Regra de Ouro da Arquitetura
+## 13. Regra de Ouro da Arquitetura
 
 > **Cada camada só conhece a camada imediatamente abaixo — nunca pula, nunca volta.**
 
