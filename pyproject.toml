@@ -7,5 +7,5 @@ profile = "black"
 line_length = 88
 
 [tool.bandit]
-exclude_dirs = ["tests", ".git", ".pytest_cache"]
-skips = ["B101"]  # assert usados nos testes
+# Escanear apenas código de produção (tests usam assert propositalmente)
+targets = ["domain", "infrastructure", "services", "utils", "ui", "main.py"]

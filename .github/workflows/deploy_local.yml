@@ -53,4 +53,4 @@ jobs:
       - name: flake8 — linting
         run: flake8 .
       - name: bandit — segurança
-        run: bandit -r . -x tests/,'./.git'
+        run: bandit -r domain/ infrastructure/ services/ utils/ ui/ main.py
